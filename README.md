@@ -102,7 +102,7 @@ pipeline {
 
 ```
 
-![image]("./Screenshots/jens.png")
+![image]("./Screenshots_prometheus_grafana/jens.png")
 
 ---
 
