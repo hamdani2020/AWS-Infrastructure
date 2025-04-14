@@ -55,69 +55,54 @@ pipeline {
   agent any
 
   environment {
-    AWS_REGION = 'us-west-2'
+    AWS_DEFAULT_REGION = 'eu-west-1'
   }
 
   stages {
     stage('Terraform Init') {
       steps {
-        withAWS(region: "${env.AWS_REGION}", credentials: 'aws-credentials-id') {
+        withAWS(credentials: 'awscreds') {
           sh 'terraform init'
         }
       }
       post {
-        success {
-          echo 'Terraform Init completed successfully.'
-        }
-        failure {
-          echo 'Terraform Init failed.'
-        }
-        always {
-          echo 'Terraform Init stage finished.'
-        }
+        success { echo 'Terraform Init completed successfully.' }
+        failure { echo 'Terraform Init failed.' }
+        always { echo 'Terraform Init stage finished.' }
       }
     }
 
     stage('Terraform Plan') {
       steps {
-        withAWS(region: "${env.AWS_REGION}", credentials: 'aws-credentials-id') {
+        withAWS(credentials: 'awscreds') {
           sh 'terraform plan'
         }
       }
       post {
-        success {
-          echo 'Terraform Plan completed successfully.'
-        }
-        failure {
-          echo 'Terraform Plan failed.'
-        }
-        always {
-          echo 'Terraform Plan stage finished.'
-        }
+        success { echo 'Terraform Plan completed successfully.' }
+        failure { echo 'Terraform Plan failed.' }
+        always { echo 'Terraform Plan stage finished.' }
       }
     }
 
     stage('Terraform Apply') {
       steps {
-        withAWS(region: "${env.AWS_REGION}", credentials: 'aws-credentials-id') {
+        withAWS(credentials: 'awscreds') {
           sh 'terraform apply -auto-approve'
         }
       }
       post {
-        success {
-          echo 'Terraform Apply completed successfully.'
-        }
-        failure {
-          echo 'Terraform Apply failed.'
-        }
-        always {
-          echo 'Terraform Apply stage finished.'
-        }
+        success { echo 'Terraform Apply completed successfully.' }
+        failure { echo 'Terraform Apply failed.' }
+        always { echo 'Terraform Apply stage finished.' }
       }
     }
   }
 }
+
 ```
+
+![image](./Screenshots/jens.png)
 
 ---
 
