@@ -30,6 +30,118 @@ resource "aws_route_table_association" "public_rt_assoc" {
   route_table_id = aws_route_table.public_rt.id
 }
 
+resource "aws_iam_role" "eks_cluster_role" {
+  name = "eks-cluster-role"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Effect = "Allow",
+      Principal = {
+        Service = "eks.amazonaws.com"
+      },
+      Action = "sts:AssumeRole"
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "eks_cluster_policy" {
+  role       = aws_iam_role.eks_cluster_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
+}
+
+resource "aws_iam_role" "eks_node_group_role" {
+  name = "eks-node-group-role"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Effect = "Allow",
+      Principal = {
+        Service = "ec2.amazonaws.com"
+      },
+      Action = "sts:AssumeRole"
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "eks_worker_node_policy" {
+  role       = aws_iam_role.eks_node_group_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
+}
+
+resource "aws_iam_role_policy_attachment" "eks_cni_policy" {
+  role       = aws_iam_role.eks_node_group_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
+}
+
+resource "aws_iam_role_policy_attachment" "ecr_read_policy" {
+  role       = aws_iam_role.eks_node_group_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+}
+
+# Tag subnets for EKS
+resource "aws_ec2_tag" "subnet_cluster_tag" {
+  count       = length(module.vpc.public_subnet_ids)
+  resource_id = module.vpc.public_subnet_ids[count.index]
+  key         = "kubernetes.io/cluster/my-eks-cluster"
+  value       = "shared"
+}
+
+resource "aws_ec2_tag" "subnet_elb_tag" {
+  count       = length(module.vpc.public_subnet_ids)
+  resource_id = module.vpc.public_subnet_ids[count.index]
+  key         = "kubernetes.io/role/elb"
+  value       = "1"
+}
+
+# EKS Cluster
+resource "aws_eks_cluster" "eks" {
+  name     = "my-eks-cluster"
+  role_arn = aws_iam_role.eks_cluster_role.arn
+
+  vpc_config {
+    subnet_ids              = module.vpc.public_subnet_ids
+    endpoint_private_access = false
+    endpoint_public_access  = true
+  }
+
+  depends_on = [
+    aws_iam_role_policy_attachment.eks_cluster_policy,
+    aws_route_table_association.public_rt_assoc
+  ]
+}
+
+# EKS Node Group
+resource "aws_eks_node_group" "node_group" {
+  cluster_name    = aws_eks_cluster.eks.name
+  node_group_name = "default"
+  node_role_arn   = aws_iam_role.eks_node_group_role.arn
+  subnet_ids      = module.vpc.public_subnet_ids
+
+  scaling_config {
+    desired_size = 2
+    max_size     = 3
+    min_size     = 1
+  }
+
+  instance_types = ["t3.medium"]
+
+  # Ensure adequate disk space
+  disk_size = 20
+
+  depends_on = [
+    aws_iam_role_policy_attachment.eks_worker_node_policy,
+    aws_iam_role_policy_attachment.eks_cni_policy,
+    aws_iam_role_policy_attachment.ecr_read_policy,
+  ]
+
+  # Optional: Add taints or labels if needed
+  # taints {
+  #   key    = "dedicated"
+  #   value  = "gpuGroup"
+  #   effect = "NO_SCHEDULE"
+  # }
+}
+
 # resource "aws_iam_role" "eks_cluster_role" {
 #   name = "eks-cluster-role"
 
