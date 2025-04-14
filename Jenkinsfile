@@ -1,55 +1,47 @@
 pipeline {
   agent any
 
+  environment {
+    AWS_DEFAULT_REGION = 'eu-west-1' // or your region
+  }
+
   stages {
     stage('Terraform Init') {
       steps {
-        sh 'terraform init'
+        withAWS(credentials: 'aws-creds') {
+          sh 'terraform init'
+        }
       }
       post {
-        success {
-          echo 'Terraform Init completed successfully.'
-        }
-        failure {
-          echo 'Terraform Init failed.'
-        }
-        always {
-          echo 'Terraform Init stage finished.'
-        }
+        success { echo 'Terraform Init completed successfully.' }
+        failure { echo 'Terraform Init failed.' }
+        always { echo 'Terraform Init stage finished.' }
       }
     }
 
     stage('Terraform Plan') {
       steps {
-        sh 'terraform plan'
+        withAWS(credentials: 'aws-creds') {
+          sh 'terraform plan'
+        }
       }
       post {
-        success {
-          echo 'Terraform Plan completed successfully.'
-        }
-        failure {
-          echo 'Terraform Plan failed.'
-        }
-        always {
-          echo 'Terraform Plan stage finished.'
-        }
+        success { echo 'Terraform Plan completed successfully.' }
+        failure { echo 'Terraform Plan failed.' }
+        always { echo 'Terraform Plan stage finished.' }
       }
     }
 
     stage('Terraform Apply') {
       steps {
-        sh 'terraform apply -auto-approve'
+        withAWS(credentials: 'aws-creds') {
+          sh 'terraform apply -auto-approve'
+        }
       }
       post {
-        success {
-          echo 'Terraform Apply completed successfully..'
-        }
-        failure {
-          echo 'Terraform Apply failed.'
-        }
-        always {
-          echo 'Terraform Apply stage finished.'
-        }
+        success { echo 'Terraform Apply completed successfully.' }
+        failure { echo 'Terraform Apply failed.' }
+        always { echo 'Terraform Apply stage finished.' }
       }
     }
   }
