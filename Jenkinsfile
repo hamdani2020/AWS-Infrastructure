@@ -8,7 +8,7 @@ pipeline {
   stages {
     stage('Terraform Init') {
       steps {
-        withAWS(credentials: 'aws-creds') {
+        withAWS(credentials: 'awscreds') {
           sh 'terraform init'
         }
       }
@@ -21,7 +21,7 @@ pipeline {
 
     stage('Terraform Plan') {
       steps {
-        withAWS(credentials: 'aws-creds') {
+        withAWS(credentials: 'awscreds') {
           sh 'terraform plan'
         }
       }
@@ -34,7 +34,7 @@ pipeline {
 
     stage('Terraform Apply') {
       steps {
-        withAWS(credentials: 'aws-creds') {
+        withAWS(credentials: 'awscreds') {
           sh 'terraform apply -auto-approve'
         }
       }
