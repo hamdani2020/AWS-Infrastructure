@@ -42,7 +42,7 @@ pipeline {
       }
       post {
         success {
-          echo 'Terraform Apply completed successfully.'
+          echo 'Terraform Apply completed successfully..'
         }
         failure {
           echo 'Terraform Apply failed.'
