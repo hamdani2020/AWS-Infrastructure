@@ -111,10 +111,11 @@ pipeline {
 ```hcl
 terraform {
   backend "s3" {
-    bucket         = "your-terraform-state-bucket"
-    key            = "infra/terraform.tfstate"
-    region         = "us-west-2"
-    dynamodb_table = "terraform-state-lock" # Deprecated warning seen, consider using use_lockfile instead
+    bucket         = "terra-state-bucket-123"
+    key            = "terraform.tfstate"
+    region         = "eu-west-1"
+    dynamodb_table = "terraform-state-lock"
+    use_lockfile   = true
   }
 }
 ```
