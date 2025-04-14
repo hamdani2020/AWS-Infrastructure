@@ -20,14 +20,14 @@ This project automates the provisioning and management of AWS infrastructure usi
 
 ## 🛠️ Technologies Used
 
-| Technology | Role |
-|------------|------|
-| Terraform  | Infrastructure provisioning |
-| AWS        | Cloud provider |
-| Jenkins    | CI/CD automation |
-| GitHub     | Source code version control |
-| S3         | Remote state storage |
-| DynamoDB   | Terraform state locking |
+| Technology             | Role                                   |
+| ---------------------- | -------------------------------------- |
+| Terraform              | Infrastructure provisioning            |
+| AWS                    | Cloud provider                         |
+| Jenkins                | CI/CD automation                       |
+| GitHub                 | Source code version control            |
+| S3                     | Remote state storage                   |
+| DynamoDB               | Terraform state locking                |
 | AWS Credentials Plugin | Secure credential injection in Jenkins |
 
 ---
@@ -102,7 +102,7 @@ pipeline {
 
 ```
 
-![image]("./Screenshots_prometheus_grafana/jens.png")
+![image](./Screenshots_prometheus_grafana/jens.png)
 
 ---
 
@@ -126,7 +126,7 @@ terraform {
 ## 🔐 Jenkins Credentials Setup
 
 1. Go to **Jenkins Dashboard > Manage Jenkins > Credentials > (Global) > Add Credentials**
-2. Select **Kind:** *AWS Credentials*
+2. Select **Kind:** _AWS Credentials_
 3. Fill in:
    - **Access Key ID**
    - **Secret Access Key**
@@ -149,10 +149,10 @@ terraform {
 
 ## 🧪 Troubleshooting
 
-| Issue | Cause | Fix |
-|-------|-------|-----|
-| `No valid credential sources found` | AWS credentials not injected | Ensure `withAWS` is used and credentials ID matches |
-| `Deprecated Parameter dynamodb_table` | S3 backend config warning | Replace with `use_lockfile = true` |
+| Issue                                                  | Cause                                    | Fix                                                               |
+| ------------------------------------------------------ | ---------------------------------------- | ----------------------------------------------------------------- |
+| `No valid credential sources found`                    | AWS credentials not injected             | Ensure `withAWS` is used and credentials ID matches               |
+| `Deprecated Parameter dynamodb_table`                  | S3 backend config warning                | Replace with `use_lockfile = true`                                |
 | `Planning failed: failed to get shared config profile` | Missing or incorrect AWS provider config | Ensure `provider "aws"` is using env vars or injected credentials |
 
 ---
